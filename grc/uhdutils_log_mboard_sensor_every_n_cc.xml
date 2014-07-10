@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<block>
+  <name>log_mboard_sensor_every_n_cc</name>
+  <key>uhdutils_log_mboard_sensor_every_n_cc</key>
+  <category>uhdutils</category>
+  <import>import uhdutils</import>
+  <make>uhdutils.log_mboard_sensor_every_n_cc($device, $sensor_name, $n, $file_name)</make>
+  <param>
+    <name>USRP Device</name>
+    <key>device</key>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>Sensor Name</name>
+    <key>sensor_name</key>
+    <type>string</type>
+  </param>
+  <param>
+    <name>N</name>
+    <key>n</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>File</name>
+    <key>file_name</key>
+    <type>file_save</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>
