@@ -42,7 +42,7 @@ namespace gr {
       : gr::sync_block("log_mboard_sensor_every_n_cc",
                        gr::io_signature::make(1, 1, sizeof(gr_complex)),
                        gr::io_signature::make(1, 1, sizeof(gr_complex))),
-        d_sensor_name(sensor_name), d_n(n), d_log(file_name), d_count(0)
+        d_sensor_name(sensor_name), d_n(n), d_log(file_name), d_count(0), d_sensor_waiting(false)
     {
       if (!d_log.is_open()) {
         throw std::runtime_error("can't open log file");
@@ -56,9 +56,31 @@ namespace gr {
      */
     log_mboard_sensor_every_n_cc_impl::~log_mboard_sensor_every_n_cc_impl()
     {
+      if (d_sensor_future.get_state() == boost::future_state::waiting) {
+        d_sensor_future.wait();
+      }
+
+      d_sensor_thread.join();
+
       if (d_log.is_open()) {
         d_log.close();
       }
+    }
+
+    std::string
+    log_mboard_sensor_every_n_cc_impl::get_sensor_value()
+    {
+      uhd::sensor_value_t sensor_value(d_device->get_mboard_sensor(d_sensor_name));
+      return sensor_value.value;
+    }
+
+    void
+    log_mboard_sensor_every_n_cc_impl::async_get_sensor_value()
+    {
+      boost::packaged_task<std::string> pt(boost::bind(&log_mboard_sensor_every_n_cc_impl::get_sensor_value, this)); 
+      d_sensor_future = pt.get_future();
+      d_sensor_thread = boost::thread(boost::move(pt));
+      d_sensor_waiting = true;
     }
 
     int
@@ -68,22 +90,27 @@ namespace gr {
     {
       const gr_complex *in = (const gr_complex *) input_items[0];
       gr_complex *out = (gr_complex *) output_items[0];
-      int output_produced = 0;
 
-      if (d_count + noutput_items >= d_n) {
-        uhd::sensor_value_t gps_gpgga_value(d_device->get_mboard_sensor(d_sensor_name));
-        d_log << gps_gpgga_value.value << std::endl;
-
-        output_produced = d_n - d_count;
-        d_count = 0;
-      } else {
-        output_produced = noutput_items;
-        d_count += noutput_items;
+      if (d_sensor_waiting && d_sensor_future.is_ready()) {
+        d_log << d_sensor_future.get() << std::endl;
+        d_sensor_waiting = false;
       }
 
-      std::memcpy(out, in, output_produced);
+      d_count += noutput_items;
 
-      return output_produced;
+      if (d_count >= d_n) {
+        if (!d_sensor_waiting) {
+          async_get_sensor_value();
+        } else {
+          std::cerr << "S";
+        }
+
+        d_count -= d_n;
+      }
+
+      std::memcpy(out, in, noutput_items);
+
+      return noutput_items;
     }
 
   } /* namespace uhdutils */

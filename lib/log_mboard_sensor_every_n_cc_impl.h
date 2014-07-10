@@ -21,9 +21,12 @@
 #ifndef INCLUDED_UHDUTILS_LOG_MBOARD_SENSOR_EVERY_N_CC_IMPL_H
 #define INCLUDED_UHDUTILS_LOG_MBOARD_SENSOR_EVERY_N_CC_IMPL_H
 
+#include <fstream>
+#include <string>
+#include <boost/thread.hpp>
+#include <boost/thread/future.hpp>
 #include <uhdutils/log_mboard_sensor_every_n_cc.h>
 #include <uhd/usrp/multi_usrp.hpp>
-#include <fstream>
 
 namespace gr {
   namespace uhdutils {
@@ -31,11 +34,18 @@ namespace gr {
     class log_mboard_sensor_every_n_cc_impl : public log_mboard_sensor_every_n_cc
     {
     private:
-      ::uhd::usrp::multi_usrp::sptr d_device;
+      uhd::usrp::multi_usrp::sptr d_device;
       std::string d_sensor_name;
       int d_n;
       std::ofstream d_log;
       int d_count;
+
+      bool d_sensor_waiting;
+      boost::thread d_sensor_thread;
+      boost::unique_future<std::string> d_sensor_future;
+
+      std::string get_sensor_value();
+      void async_get_sensor_value();
 
     public:
       log_mboard_sensor_every_n_cc_impl(std::string dev_addr, const char *sensor_name, int n, const char *file_name);
