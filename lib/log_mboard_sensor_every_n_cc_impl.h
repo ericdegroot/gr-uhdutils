@@ -22,7 +22,7 @@
 #define INCLUDED_UHDUTILS_LOG_MBOARD_SENSOR_EVERY_N_CC_IMPL_H
 
 #include <uhdutils/log_mboard_sensor_every_n_cc.h>
-
+#include <uhd/usrp/multi_usrp.hpp>
 #include <fstream>
 
 namespace gr {
@@ -38,7 +38,7 @@ namespace gr {
       int d_count;
 
     public:
-      log_mboard_sensor_every_n_cc_impl(::uhd::usrp::multi_usrp::sptr device, const char *sensor_name, int n, const char *file_name);
+      log_mboard_sensor_every_n_cc_impl(std::string dev_addr, const char *sensor_name, int n, const char *file_name);
       ~log_mboard_sensor_every_n_cc_impl();
 
       // Where all the action really happens

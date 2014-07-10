@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <block>
-  <name>log_mboard_sensor_every_n_cc</name>
+  <name>Log MBoard Sensor Every N</name>
   <key>uhdutils_log_mboard_sensor_every_n_cc</key>
   <category>uhdutils</category>
   <import>import uhdutils</import>
-  <make>uhdutils.log_mboard_sensor_every_n_cc($device, $sensor_name, $n, $file_name)</make>
+  <make>uhdutils.log_mboard_sensor_every_n_cc($dev_addr, $sensor_name, $n, $file_name)</make>
   <param>
-    <name>USRP Device</name>
-    <key>device</key>
-    <type>raw</type>
+    <name>Device Addr</name>
+    <key>dev_addr</key>
+    <value>""</value>
+    <type>string</type>
   </param>
   <param>
     <name>Sensor Name</name>

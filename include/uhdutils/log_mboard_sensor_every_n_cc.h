@@ -24,7 +24,6 @@
 
 #include <uhdutils/api.h>
 #include <gnuradio/sync_block.h>
-#include <uhd/usrp/multi_usrp.hpp>
 
 namespace gr {
   namespace uhdutils {
@@ -47,7 +46,7 @@ namespace gr {
        * class. uhdutils::log_mboard_sensor_every_n_cc::make is the public interface for
        * creating new instances.
        */
-      static sptr make(::uhd::usrp::multi_usrp::sptr device, const char *sensor_name, int n, const char *file_name);
+      static sptr make(std::string dev_addr, const char *sensor_name, int n, const char *file_name);
     };
 
   } // namespace uhdutils

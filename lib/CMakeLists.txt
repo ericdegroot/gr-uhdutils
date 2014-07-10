@@ -22,8 +22,12 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+include_directories(
+    ${Boost_INCLUDE_DIR}
+)
+link_directories(
+    ${Boost_LIBRARY_DIRS}
+)
 
 list(APPEND uhdutils_sources
     log_mboard_sensor_every_n_cc_impl.cc
@@ -36,7 +40,7 @@ if(NOT uhdutils_sources)
 endif(NOT uhdutils_sources)
 
 add_library(gnuradio-uhdutils SHARED ${uhdutils_sources})
-target_link_libraries(gnuradio-uhdutils ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-uhdutils ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} uhd)
 set_target_properties(gnuradio-uhdutils PROPERTIES DEFINE_SYMBOL "gnuradio_uhdutils_EXPORTS")
 
 if(APPLE)
@@ -73,6 +77,7 @@ target_link_libraries(
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
+  uhd
   gnuradio-uhdutils
 )
 

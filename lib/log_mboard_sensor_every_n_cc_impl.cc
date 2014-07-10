@@ -29,24 +29,26 @@ namespace gr {
   namespace uhdutils {
 
     log_mboard_sensor_every_n_cc::sptr
-    log_mboard_sensor_every_n_cc::make(::uhd::usrp::multi_usrp::sptr device, const char *sensor_name, int n, const char *file_name)
+    log_mboard_sensor_every_n_cc::make(std::string dev_addr, const char *sensor_name, int n, const char *file_name)
     {
       return gnuradio::get_initial_sptr
-        (new log_mboard_sensor_every_n_cc_impl(device, sensor_name, n, file_name));
+        (new log_mboard_sensor_every_n_cc_impl(dev_addr, sensor_name, n, file_name));
     }
 
     /*
      * The private constructor
      */
-    log_mboard_sensor_every_n_cc_impl::log_mboard_sensor_every_n_cc_impl(::uhd::usrp::multi_usrp::sptr device, const char *sensor_name, int n, const char *file_name)
+    log_mboard_sensor_every_n_cc_impl::log_mboard_sensor_every_n_cc_impl(std::string dev_addr, const char *sensor_name, int n, const char *file_name)
       : gr::sync_block("log_mboard_sensor_every_n_cc",
                        gr::io_signature::make(1, 1, sizeof(gr_complex)),
                        gr::io_signature::make(1, 1, sizeof(gr_complex))),
-        d_device(device), d_sensor_name(sensor_name), d_n(n), d_log(file_name), d_count(0)
+        d_sensor_name(sensor_name), d_n(n), d_log(file_name), d_count(0)
     {
       if (!d_log.is_open()) {
         throw std::runtime_error("can't open log file");
       }
+
+      d_device = uhd::usrp::multi_usrp::make(dev_addr);
     }
 
     /*
